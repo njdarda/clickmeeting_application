@@ -22,7 +22,7 @@ class DropboxLoginController extends AbstractController
         $provider = new Dropbox([
             'clientId' => $_SERVER['DROPBOX_CLIENT_ID'],
             'clientSecret' => $_SERVER['DROPBOX_CLIENT_SECRET'],
-             'redirectUri' => $_SERVER['APP_URL'] . 'dropbox_login',
+             'redirectUri' => $_SERVER['APP_URL'] . '/dropbox_login',
         ]);
 
         if (!isset($_GET['code'])) {

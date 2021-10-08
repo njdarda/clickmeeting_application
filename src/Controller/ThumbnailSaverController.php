@@ -24,8 +24,11 @@ class ThumbnailSaverController extends AbstractController
         $info = null;
 
         if ($request->query->get('save') === 'dropbox') {
-            $this->saveToDropbox($session);
-            $info = "Uploaded to Dropbox";
+            if ($this->saveToDropbox($session)) {
+                $info = "Uploaded to Dropbox";
+            } else {
+                return $this->redirect('dropbox_login');
+            }
         } elseif ($request->query->get('save') === 'amazon') {
             $this->saveToS3($session);
             $info = "Uploaded to Amazon S3";
@@ -70,7 +73,7 @@ class ThumbnailSaverController extends AbstractController
     {
         $token = $session->get('dropbox-token');
         if (!$token) {
-            return $this->redirect('dropbox_login');
+            return false;
         } else {
             $client = new Client($token);
             $client->upload(
