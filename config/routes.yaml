@@ -1,3 +1,12 @@
 index:
    path: /
    controller: App\Controller\ThumbnailCreatorController::index
+save_thumbnail:
+   path: /save_thumbnail
+   controller: App\Controller\ThumbnailSaverController::index
+dropbox_login:
+   path: /dropbox_login
+   controller: App\Controller\DropboxLoginController::index
+amazon_s3:
+   path: /amazon_s3
+   controller: App\Controller\AmazonS3Controller::index
