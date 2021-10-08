@@ -1,13 +1,9 @@
 # clickmeeting_application
 
-Simple application that lets you upload an image and save its 150px x 150px thumbnail on disk, Dropbox, or an Amazon S3 Bucket.
+Simple application that lets you create a 150px x 150px thumbnail of an image. You can then save it on disk or upload to Dropbox, or an Amazon S3 Bucket.
 Built on top of symfony/skeleton.
 
-These commits contain implementation:
-
-https://github.com/njdarda/clickmeeting_application/compare/b57cea781333a3759cdba8d1f07229e3a18d42bf...17a11482c209208156a033960752adeb8caad98f
-
-The rest is mostly setup and styling.
+[These commits contain implementation](https://github.com/njdarda/clickmeeting_application/compare/b57cea781333a3759cdba8d1f07229e3a18d42bf...17a11482c209208156a033960752adeb8caad98f). The rest is mostly setup and styling.
 
 ## Getting started
 
