@@ -1,5 +1,24 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {{ form(form) }}
+    <div class="form-group">
+        <h2>Thumbnail creator</h2>
+
+        {{ form_start(form) }}
+        <div>
+            {{ form_errors(form) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.source, null, {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.source, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.source) }}
+        </div>
+
+        <div class="row">
+            {{ form_row(form.save) }}
+        </div>
+
+        {{ form_end(form) }}
+    </div>
 {% endblock %}

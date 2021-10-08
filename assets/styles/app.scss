@@ -1,0 +1,20 @@
+@import "~bootstrap/scss/bootstrap";
+
+body {
+    background-color: lightgray;
+}
+
+#app {
+    padding: 2em;
+    border-radius: 1em;
+    background-color: white;
+    box-shadow: 0px 10px 40px 10px rgba(0,0,0,0.2);
+
+    .image-wrapper {
+        text-align: center;
+
+        & > img {
+            box-shadow: 0px 10px 40px 10px rgba(0,0,0,0.4);
+        }
+    }
+}

@@ -1,17 +1,24 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <button id="file" class="save-button">Save to file</button>
-    <button id="dropbox" class="save-button">Save to Dropbox</button>
-    <button id="amazon" class="save-button">Save to Amazon S3</button>
+     <div class="image-wrapper">
+        <img class="uploaded-image" src="{{ imageSource }}" alt="Uploaded image">
+    </div>
+
+    <div class="form-group">
+        {{ form(form) }}
+    </div>
+
+    <a href="/">Upload another image</a>
 {% endblock %}
 
 {% block javascripts %}
     <script>
         document.querySelectorAll('button.save-button').forEach(function (button) {
-            let id = button.id
-            button.onclick = function () {
-                window.location = window.location.origin + window.location.pathname + '?save=' + id;
+            let saveTo = button.id.slice(5)
+            button.onclick = function (event) {
+                event.preventDefault()
+                window.location = window.location.origin + window.location.pathname + '?save=' + saveTo
             }
         });
     </script>
