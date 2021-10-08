@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <button id="file" class="save-button">Save to file</button>
+    <button id="dropbox" class="save-button">Save to Dropbox</button>
+    <button id="amazon" class="save-button">Save to Amazon S3</button>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.querySelectorAll('button.save-button').forEach(function (button) {
+            let id = button.id
+            button.onclick = function () {
+                window.location = window.location.origin + window.location.pathname + '?save=' + id;
+            }
+        });
+    </script>
+{% endblock %}
