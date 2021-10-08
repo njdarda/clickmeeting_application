@@ -34,7 +34,11 @@ class ThumbnailCreatorController extends AbstractController
                     ]),
                 ],
             ])
-            ->add('save', SubmitType::class, ['label' => 'Create thumbnail'])
+            ->add(
+                'save',
+                SubmitType::class,
+                ['label' => 'Create thumbnail', 'attr' => ['class' => 'btn btn-secondary save-button mb-2']]
+            )
             ->getForm();
 
         $form->handleRequest($request);
@@ -44,21 +48,32 @@ class ThumbnailCreatorController extends AbstractController
             $imageFile = $form->get('source')->getData();
 
             $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $uniqueFilename = $slugger->slug($originalFilename).'_'.uniqid();
+            $uniqueFilename = $slugger->slug($originalFilename) . '_' . uniqid();
 
+            /** @var \GdImage $image */
+            $image = null;
             if ($imageFile->getMimeType() === 'image/png') {
                 $image = imagecreatefrompng($imageFile->getPathname());
-                $fileName = $uniqueFilename.'.png';
-                imagepng(imagescale($image, 150), $this->getParameter('upload_directory').'/'.$fileName);
-
-                $session->set('filename', $fileName);
-                return $this->redirectToRoute('save_thumbnail', [], 301);
             } elseif ($imageFile->getMimeType() === 'image/jpeg') {
                 $image = imagecreatefromjpeg($imageFile->getPathname());
-                $fileName = $uniqueFilename.'.jpg';
-                imagejpeg(imagescale($image, 150), $this->getParameter('upload_directory').'/'.$fileName);
+            }
+
+            if ($image) {
+                $fileName = $uniqueFilename . '.png';
+                $imageWidth = imagesx($image);
+                $imageHeight = imagesy($image);
+
+                $ratio = $imageWidth / $imageHeight;
+
+                if ($imageWidth > 150 && $ratio > 1) {
+                    $image = imagescale($image, 150, 150 / $ratio);
+                } elseif ($imageHeight > 150 && $ratio < 1) {
+                    $image = imagescale($image, $ratio * 150, 150);
+                }
+                imagepng($image, $this->getParameter('upload_directory') . '/' . $fileName);
 
                 $session->set('filename', $fileName);
+
                 return $this->redirectToRoute('save_thumbnail', [], 301);
             }
         }
