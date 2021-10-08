@@ -18,7 +18,7 @@ Run the following command in project's root directory:
 ```
 This will download a docker image with required environment and start the server on `localhost:8000`.
 
-If you need to change use different port you can do that by changing the exposed port in `docker/docker-compose.yml`
+If you need to use different port you can do that by changing the exposed port in `docker/docker-compose.yml`
 ```
     ports:
       - "[PORT]:80"
