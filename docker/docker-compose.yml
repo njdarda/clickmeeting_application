@@ -1,0 +1,7 @@
+services:
+  clickmeeting:
+    build: .
+    ports:
+      - "8000:80"
+    volumes:
+      - ..:/project
