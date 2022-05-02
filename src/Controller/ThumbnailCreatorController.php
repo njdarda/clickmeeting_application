@@ -25,7 +25,7 @@ class ThumbnailCreatorController extends AbstractController
                 'required' => true,
                 'constraints' => [
                     new File([
-                        'maxSize' => '8024k',
+                        'maxSize' => '8096k',
                         'mimeTypes' => [
                             'image/png',
                             'image/jpeg',
@@ -60,9 +60,9 @@ class ThumbnailCreatorController extends AbstractController
 
             if ($image) {
                 $fileName = $uniqueFilename . '.png';
+
                 $imageWidth = imagesx($image);
                 $imageHeight = imagesy($image);
-
                 $ratio = $imageWidth / $imageHeight;
 
                 if ($imageWidth > 150 && $ratio > 1) {

@@ -15,23 +15,24 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class ThumbnailSaverController extends AbstractController
 {
+    private $info = '';
+    private $errors = '';
+
     public function index(Request $request, SessionInterface $session): Response
     {
         if (!$session->get('filename')) {
             return $this->redirectToRoute('index', [], 301);
         }
 
-        $info = null;
-
         if ($request->query->get('save') === 'dropbox') {
             if ($this->saveToDropbox($session)) {
-                $info = "Uploaded to Dropbox";
+                $this->info = "Uploaded to Dropbox";
             } else {
                 return $this->redirect('dropbox_login');
             }
         } elseif ($request->query->get('save') === 'amazon') {
             $this->saveToS3($session);
-            $info = "Uploaded to Amazon S3";
+            $this->info = "Uploaded to Amazon S3";
         } elseif ($request->query->get('save') === 'disk') {
             $response = new BinaryFileResponse(
                 $this->getParameter('upload_directory') . '/' . $session->get('filename')
@@ -64,12 +65,13 @@ class ThumbnailSaverController extends AbstractController
 
         return $this->renderForm('views/thumbnail_saver.html.twig', [
             'imageSource' => '/upload/' . $session->get('filename'),
-            'info' => $info,
+            'errors' => $this->errors,
+            'info' => $this->info,
             'form' => $form,
         ]);
     }
 
-    protected function saveToDropbox(SessionInterface $session)
+    protected function saveToDropbox(SessionInterface $session): bool
     {
         $token = $session->get('dropbox-token');
         if (!$token) {
@@ -85,25 +87,29 @@ class ThumbnailSaverController extends AbstractController
         return true;
     }
 
-    protected function saveToS3($session)
+    protected function saveToS3(SessionInterface $session): bool
     {
         $s3 = new S3Client([
             'version' => 'latest',
             'region' => 'eu-central-1',
             'credentials' => [
-                'key' => $_SERVER['AWS_ACCESS_KEY_ID'],
-                'secret' => $_SERVER['AWS_SECRET_ACCESS_KEY'],
+                'key' => $_ENV['AWS_ACCESS_KEY_ID'],
+                'secret' => $_ENV['AWS_SECRET_ACCESS_KEY'],
             ],
         ]);
 
         try {
             $s3->putObject([
-                'Bucket' => $_SERVER['AWS_BUCKET_NAME'],
+                'Bucket' => $_ENV['AWS_BUCKET_NAME'],
                 'Key' => $session->get('filename'),
                 'Body' => file_get_contents($this->getParameter('upload_directory') . '/' . $session->get('filename')),
             ]);
+
+            return true;
         } catch (S3Exception $exception) {
-            echo $exception->getMessage();
+            $this->errors = $exception->getMessage();
+
+            return false;
         }
     }
 }

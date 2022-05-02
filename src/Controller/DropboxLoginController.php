@@ -4,41 +4,40 @@ namespace App\Controller;
 
 use Stevenmaguire\OAuth2\Client\Provider\Dropbox;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class DropboxLoginController extends AbstractController
 {
-    public function index(SessionInterface $session): Response
+    public function index(Request $request, SessionInterface $session): Response
     {
-
-        $session->set('dropbox-token', $this->getDropboxToken());
+        $session->set('dropbox-token', $this->getDropboxToken($request, $session));
 
         return $this->redirectToRoute('save_thumbnail', ['save' => 'dropbox',], 301);
     }
 
-    public function getDropboxToken(): string
+    protected function getDropboxToken(Request $request, SessionInterface $session): string
     {
         $provider = new Dropbox([
-            'clientId' => $_SERVER['DROPBOX_CLIENT_ID'],
-            'clientSecret' => $_SERVER['DROPBOX_CLIENT_SECRET'],
-             'redirectUri' => $_SERVER['APP_URL'] . '/dropbox_login',
+            'clientId' => $_ENV['DROPBOX_CLIENT_ID'],
+            'clientSecret' => $_ENV['DROPBOX_CLIENT_SECRET'],
+            'redirectUri' => $_ENV['APP_URL'] . '/dropbox_login',
         ]);
 
-        if (!isset($_GET['code'])) {
+        if (!$request->get('code')) {
             $authUrl = $provider->getAuthorizationUrl();
-            $_SESSION['oauth2state'] = $provider->getState();
+            $session->set('oauth2state', $provider->getState());
             header('Location: ' . $authUrl);
+
             exit;
+        } elseif (!$request->get('state') || ($request->get('state') !== $session->get('oauth2state'))) {
+            $session->remove('oauth2state');
 
-        } elseif (empty($_GET['state']) || (isset($_SESSION) && $_GET['state'] !== $_SESSION['oauth2state'])) {
-
-            unset($_SESSION['oauth2state']);
             exit('Invalid state');
-
         } else {
             $token = $provider->getAccessToken('authorization_code', [
-                'code' => $_GET['code'],
+                'code' => $request->get('code'),
             ]);
 
             return $token->getToken();
